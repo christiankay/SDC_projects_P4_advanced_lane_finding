@@ -63,7 +63,7 @@ To demonstrate this step, I will describe how I apply the distortion correction 
 
 ####2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 
-I used a combination of color and gradient threshholds to generate binary images (threshholding steps at lines 16 through 154 in `threshholding.py`). I also used morphology based opening and closing operators ('gradient_detection' in 'threshholds.py' to obtain binary images with potentially less noise. Here's an example of my output for this step.  
+I used a combination of color and gradient threshholds to generate binary images (threshholding steps at lines 16 through 154 in `threshholding.py`). I also used morphology based opening and closing operators ('gradient_detection()' in 'threshholds.py' to obtain binary images with potentially less noise. Here's an example of my output for this step.  
 
 ![alt text][image3]
 ![alt text][image32]
@@ -73,7 +73,7 @@ I used a combination of color and gradient threshholds to generate binary images
 
 ####3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
 
-The code for my perspective transform includes a function called `warp_image`, which appears in lines 64 through 94 in the file `perspective.py` .  The `warp_image` function takes as inputs an image (`img`) and the direction of warping (reverse = True/False). Source (`src`) and destination (`dst`) points are hardcoded in this function. The points were used as arguments for a sub-function 'transform()' which finally warps the image to the destination points. I chose the source and destination points in the following manner:
+The code for my perspective transform includes a function called `warp_image()` which appears in lines 64 through 94 in file `perspective.py`. The `warp_image()` function takes as inputs an image (`img`) and the direction of warping (reverse = True/False). Source (`src`) and destination (`dst`) points are hardcoded in this function. The points were used as arguments for a sub-function 'transform()' which finally warps the image to the destination points. I chose the source and destination points in the following manner:
 
 ```python
     ### point to define source geometry
@@ -97,15 +97,15 @@ I verified that my perspective transform was working as expected by drawing the 
 
 #### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 
-I used a second order polynomal to fit left and right lane lines seperately. To find sufficiant fit points, the pipeline explained above was applied to get a warped binary image of possible lane line points. Based on that binary histogram evaluation and sliding windows were used to determine which points in the binary image belong to the lane lines. (file 'lane_finder', line 89 to 208)
+I used a second order polynomial to fit left and right lane lines seperately. To find sufficiant fit points, the pipeline explained above was used to get a warped binary image of possible lane line points. Based on that binary histogram evaluation and sliding windows were used to determine which points in the binary image belong to possible lane lines. (file 'lane_finder', line 89 to 208)
 
 ![alt text][image5]
 
-Once the lane were found and a sufficiant fit (fit score evaluation can be found in line 373 to 417) was applied, the function 'scan_rows_near_fit()' in 'lane_finder.py' was called to only search for new points in the area close to the last fit (margin = 150 pixels). This area is marked (green) in the following image while the last fits (left and right) are represented by the white lines: 
+Once the lane were found and a sufficiant fit (fit score evaluation can be found in line 373 to 417) was applied, the function 'scan_rows_near_fit()' in 'lane_finder.py' was called to only search for new points in the area close to the last fit (margin = 150 pixels). This area is marked (green) in the following image while the last fits (left and right) are represented by white lines: 
 
 ![alt text][image6]
 
-In line 473 through 535 the (method 'main_test()') the pipeline decision making is coded. First a if statement decides whether 'sliding_windows() or "searching for lane point near last fit" is used. For every fit pair a score based on 1. residuals 2. slope and bend and 3. number of lane points is calculated. A lane fit will only be added to the list of last 10 lane fits if the current score is not less than 50% of the median score of 10 last lane fits. Curvature, center offset and lane drawing is baesed on the mean of 10 last sufficiant lane line fits. 
+In line 473 through 535 (method 'main_test()') the pipeline decision making is coded. First a if statement decides whether 'sliding_windows() or "searching for lane point near last fit" is used. For every fit pair a score based on 1. residuals 2. slope and bend and 3. number of lane points used for the fit is calculated. A lane fit will only be added to the list of last 10 lane fits if the current score is not less than 50% of the median score of last 10 lane fits. Curvature, center offset and lane drawing is baesed on the mean of 10 last sufficiant lane line fits. 
 
 #### 5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
 
@@ -113,7 +113,7 @@ I did this in lines 426 through 468 in my code in `lane_finder.py`. The curvatur
 
 ![alt text][image7]
 
-The center was found by assuming the camera to be mounted at the center of the front window and by calculating the mean of the left and right fit values at the bottom of any image.
+The center was found by assuming the camera to be mounted at the center of the front window and by calculating the mean of left and right fit values at the bottom of every image.
 
 
 
@@ -137,8 +137,7 @@ Here's a [link to my video result](./output_project_video_5scores_q50.mp4)
 
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
-Backbone of the pipeline is thresholding and binary creation (feature extraction) to use them as points for polynomial fits. In case of changes in the illumination the pipeline is likely to fail since the color and gradient threshholds are static and  new gradients and colors might appear in the images. More robust techniques for feature extraction are neccassary like adaptive threshholding or deep neural networks.
-
+Backbone of the pipeline is threshholding and binary image creation (feature extraction) to use them as points for polynomial fits. In case of changes in the illumination the pipeline is likely to fail since the color and gradient threshholds are static and new gradients and colors might appear in the images. More robust techniques for feature extraction are neccassary like adaptive threshholding or deep neural networks.
 Also information regarding the direction of the movement (optical flow) could be used to estimate the movement of the car.
 
 

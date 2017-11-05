@@ -63,7 +63,7 @@ To demonstrate this step, I will describe how I apply the distortion correction 
 
 ####2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 
-I used a combination of color and gradient thresholds to generate a binary image (thresholding steps at lines 16 through 154 in `threshholding.py`).  Here's an example of my output for this step.  
+I used a combination of color and gradient threshholds to generate binary images (threshholding steps at lines 16 through 154 in `threshholding.py`). I also used morphology based opening and closing operators ('gradient_detection' in 'threshholds.py' to obtain binary images with potentially less noise. Here's an example of my output for this step.  
 
 ![alt text][image3]
 ![alt text][image32]
@@ -97,7 +97,7 @@ I verified that my perspective transform was working as expected by drawing the 
 
 #### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 
-I used a second order polynomal to fit left and right lane lines seperately. To find sufficiant fit points, the pipeline expanainded above was applied to get a warped binary image of possible lane line points. Based on that binary histogram evaluation and sliding windows were used to determinde which points in the binary image belong to the lane lines. (file 'lane_finder', line 89 to 208)
+I used a second order polynomal to fit left and right lane lines seperately. To find sufficiant fit points, the pipeline explained above was applied to get a warped binary image of possible lane line points. Based on that binary histogram evaluation and sliding windows were used to determine which points in the binary image belong to the lane lines. (file 'lane_finder', line 89 to 208)
 
 ![alt text][image5]
 
@@ -105,7 +105,7 @@ Once the lane were found and a sufficiant fit (fit score evaluation can be found
 
 ![alt text][image6]
 
-In line 473 through 535 the (method 'main_test()') the pipeline decision making is set. First a if statement decides whether 'sliding_windows() or "searching for lane point near last fit" is used. For every fit pair a score based on 1. resuduals 2. slope and bend and 3. number of lane points is calculated. A lane fit will only be added to the list of last 10 lane fits if the current score is not less than 50% of the median score of 10 last lane fits. Curvature, center offset and lane drawing is baesed on the mean of 10 last sufficiant line fits. 
+In line 473 through 535 the (method 'main_test()') the pipeline decision making is coded. First a if statement decides whether 'sliding_windows() or "searching for lane point near last fit" is used. For every fit pair a score based on 1. residuals 2. slope and bend and 3. number of lane points is calculated. A lane fit will only be added to the list of last 10 lane fits if the current score is not less than 50% of the median score of 10 last lane fits. Curvature, center offset and lane drawing is baesed on the mean of 10 last sufficiant lane line fits. 
 
 #### 5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
 

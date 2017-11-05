@@ -105,7 +105,7 @@ Once the lane were found and a sufficiant fit (fit score evaluation can be found
 
 ![alt text][image6]
 
-In line 473 through 535 the (method 'main_test()') the pipeline decision making is set. First a if statement decides if 'sliding_windows() or "searching for lane point near last fit" is used.  
+In line 473 through 535 the (method 'main_test()') the pipeline decision making is set. First a if statement decides whether 'sliding_windows() or "searching for lane point near last fit" is used. For every fit pair a score based on 1. resuduals 2. slope and bend and 3. number of lane points is calculated. A lane fit will only be added to the list of last 10 lane fits if the current score is not less than 50% of the median score of 10 last lane fits. Curvature, center offset and lane drawing is baesed on the mean of 10 last sufficiant line fits. 
 
 #### 5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
 
@@ -137,4 +137,10 @@ Here's a [link to my video result](./output_project_video_5scores_q50.mp4)
 
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
+Backbone of the pipeline is thresholding and binary creation (feature extraction) to use them as points for polynomial fits. In case of changes in the illumination the pipeline is likely to fail since the color and gradient threshholds are static and  new gradients and colors might appear in the images. More robust techniques for feature extraction are neccassary like adaptive threshholding or deep neural networks.
+
+Also information regarding the direction of the movement (optical flow) could be used to estimate the movement of the car.
+
+
+
+

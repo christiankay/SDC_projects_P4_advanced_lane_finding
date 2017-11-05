@@ -36,15 +36,15 @@ The goals / steps of this project are the following:
 
 ---
 
-###Writeup / README
+### Writeup / README
 
 ####1. Provide a Writeup / README that includes all the rubric points and how you addressed each one.  You can submit your writeup as markdown or pdf.  [Here](https://github.com/udacity/CarND-Advanced-Lane-Lines/blob/master/writeup_template.md) is a template writeup for this project you can use as a guide and a starting point.  
 
 You're reading it!
 
-###Camera Calibration
+### Camera Calibration
 
-####1. Briefly state how you computed the camera matrix and distortion coefficients. Provide an example of a distortion corrected calibration image.
+#### 1. Briefly state how you computed the camera matrix and distortion coefficients. Provide an example of a distortion corrected calibration image.
 
 The code for this step is contained in lines 16 through 68 of the file called `cam_calibration.py`).  
 
@@ -54,14 +54,14 @@ I then used the output `objpoints` and `imgpoints` to compute the camera calibra
 
 ![alt text][image1]
 
-###Pipeline (single images)
+### Pipeline (single images)
 
-####1. Provide an example of a distortion-corrected image.
+#### 1. Provide an example of a distortion-corrected image.
 
 To demonstrate this step, I will describe how I apply the distortion correction to one of the test images like this one:
 ![alt text][image2]
 
-####2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
+#### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 
 I used a combination of color and gradient threshholds to generate binary images (threshholding steps at lines 16 through 154 in `threshholding.py`). I also used morphology based opening and closing operators ('gradient_detection()' in 'threshholds.py' to obtain binary images with potentially less noise. Here's an example of my output for this step.  
 
@@ -71,7 +71,7 @@ I used a combination of color and gradient threshholds to generate binary images
 ![alt text][image34]
 
 
-####3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
+#### 3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
 
 The code for my perspective transform includes a function called `warp_image()` which appears in lines 64 through 94 in file `perspective.py`. The `warp_image()` function takes as inputs an image (`img`) and the direction of warping (reverse = True/False). Source (`src`) and destination (`dst`) points are hardcoded in this function. The points were used as arguments for a sub-function 'transform()' which finally warps the image to the destination points. I chose the source and destination points in the following manner:
 

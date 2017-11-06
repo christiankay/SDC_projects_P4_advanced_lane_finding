@@ -62,7 +62,7 @@ def transform(img, calib_filename, src_points , dst_points):
     return img, warped, M
 
 def warp_image(img, reverse = False):
-    calib_filename = "C:/Users/Chris/SDC_projects/CarND-Advanced-Lane-Lines-P4/saved_calibration.p"
+    calib_filename = "saved_calibration.p"
     img_size = img.shape
     image_width = img_size[1]
     image_height = img_size[0]
@@ -94,8 +94,8 @@ def warp_image(img, reverse = False):
     return original_image, top_down, perspective_M 
     
 if __name__ == "__main__":   
-    filename = 'C:/Users/Chris/SDC_projects/CarND-Advanced-Lane-Lines-P4/test_images/straight_lines1.jpg'
-    calib_filename = "C:/Users/Chris/SDC_projects/CarND-Advanced-Lane-Lines-P4/saved_calibration.p"
+    filename = 'straight_lines1.jpg'
+    calib_filename = "saved_calibration.p"
     img = mpimg.imread(filename)
 
     ##### use warp_image and transform and plot results

@@ -21,45 +21,39 @@ import glob
 class find_lanes():
     def __init__(self):
        
-        self.lanes_found = False
-        self.good_lanes = False
+
         self.recent_left_fits = []
         self.recent_right_fits =[]
         self.fit_line_width = 20
-        
+        self.fail_counter = 0
+        self.fail_limit = 10 # how many times scanning near fit can fail until sliding windows will be used
         self.img = None
         self.image_height = None
         self.image_width = None
-        self.nwindows = 15          # Choose the number of sliding windows
-        self.margin = 150            # Set the width of the windows +/- margin
+        self.nwindows = 9          # Choose the number of sliding windows
+        self.margin = 100            # Set the width of the windows +/- margin
                 
         self.minpix = 50             # Set minimum number of pixels found to recenter window  
 
         self.plotting = False        # enables plotting of images
         
  
-        self.n_lanes = 10
+        self.n_lanes = 5
+        
         self.leftx = None # 
         self.lefty = None 
         self.rightx = None
         self.righty = None
-        self.quality = 0.5 #defines when a lane will be added to recent lanes; 50% means that the lane score has to be at least 50% of median recent lane scores
+        self.quality = 0.20 #defines when a lane will be added to recent lanes; 50% means that the lane score has to be at least 50% of median recent lane scores
         
         # was the line detected in the last iteration?
         self.detected = False  
-        # x values of the last n fits of the line
-        self.recent_xfitted = [] 
-        #average x values of the fitted line over the last n iterations
-        self.bestx = None     
-        #polynomial coefficients averaged over the last n iterations
-        self.best_fit = None  
         #polynomial coefficients for the most recent fit
         self.last_fit_left = None    # last fit of left lane points
         self.last_fit_right = None   # last fit of right lane points
         #radius of curvature of the line in some units
         self.radius_of_curvature = None 
-        #distance in meters of vehicle center from the line
-        self.line_base_pos = None 
+  
         #difference in fit coefficients between last and new fits
         self.recent_lane_scores = [np.nan] * self.n_lanes
         
@@ -67,20 +61,7 @@ class find_lanes():
         
         self.distance_from_center = None
 
-        
-        
-
-        
-        
-    def test_lanes(self):
-        
-        
-        
-        print ("detected", self.detected)
-        print ("radius_of_curvature", self.radius_of_curvature)
-        
-        
-        
+  
         
     def print_lane_stats(self):
         
@@ -167,46 +148,45 @@ class find_lanes():
         if len(self.leftx) > self.minpix:
             left_fit  = np.polyfit(self.lefty, self.leftx, 2)
             self.last_fit_left = left_fit
-            if len(self.rightx) > self.minpix:    
-                right_fit  = np.polyfit(self.righty, self.rightx, 2)
-                self.last_fit_right = right_fit 
-                self.detected = True
-            else:
-                print("right fit reqires more points!", len(self.rightx) )
-                self.detected = False
-                right_fit = np.nanmean(self.recent_right_fits, axis=0)
         else:
-            print("left fit reqires more points!", len(self.leftx))
-            self.detected = False
-            left_fit = np.nanmean(self.recent_left_fits, axis=0)
+            print("left fit requires more points!", len(self.leftx))
+            left_fit = np.nanmean(self.recent_left_fits, axis=0)    
+            
+        if len(self.rightx) > self.minpix:    
+            right_fit  = np.polyfit(self.righty, self.rightx, 2)
+            self.last_fit_right = right_fit 
+        else:
+            print("right fit requires more points!", len(self.rightx) )     
+            right_fit = np.nanmean(self.recent_right_fits, axis=0)
         
 
             
-    
-        # Generate x and y values for plotting
-        self.ploty = np.linspace(0, binary_warped.shape[0]-1, binary_warped.shape[0] )
-        left_fitx = left_fit[0]*self.ploty**2 + left_fit[1]*self.ploty + left_fit[2]
-        right_fitx = right_fit[0]*self.ploty**2 + right_fit[1]*self.ploty + right_fit[2]
-        
-        out_img[self.lefty, self.leftx] = [255, 0, 0]
-        out_img[nonzeroy[right_lane_inds], nonzerox[right_lane_inds]] = [0, 0, 255]
-    
-        original_image, top_down, perspective_Ms = pers.warp_image(out_img , True)
-    
-        if self.plotting is True:
-            plt.figure(0)
-            plt.imshow(out_img)
-            plt.plot(left_fitx, self.ploty, color='white', linewidth=2)
-            plt.plot(right_fitx, self.ploty, color='white', linewidth=2)
-            plt.xlim(0, 1280)
-            plt.ylim(720, 0)
-            plt.figure(1)
-            plt.imshow(top_down)
-            plt.figure(2)
-            plt.imshow(img)
+        try:    
+            # Generate x and y values for plotting
+            self.ploty = np.linspace(0, binary_warped.shape[0]-1, binary_warped.shape[0] )
+            left_fitx = left_fit[0]*self.ploty**2 + left_fit[1]*self.ploty + left_fit[2]
+            right_fitx = right_fit[0]*self.ploty**2 + right_fit[1]*self.ploty + right_fit[2]
             
-            return out_img
-    
+            out_img[self.lefty, self.leftx] = [255, 0, 0]
+            out_img[nonzeroy[right_lane_inds], nonzerox[right_lane_inds]] = [0, 0, 255]
+        
+            original_image, top_down, perspective_Ms = pers.warp_image(out_img , True)
+        
+            if self.plotting is True:
+                plt.figure(0)
+                plt.imshow(out_img)
+                plt.plot(left_fitx, self.ploty, color='white', linewidth=2)
+                plt.plot(right_fitx, self.ploty, color='white', linewidth=2)
+                plt.xlim(0, 1280)
+                plt.ylim(720, 0)
+                plt.figure(1)
+                plt.imshow(top_down)
+                plt.figure(2)
+                plt.imshow(img)
+                
+                return out_img
+        except:
+            print("test")
     
     def scan_rows_near_fit(self, img):
         print (self.ploty.shape , self.leftx.shape)
@@ -223,8 +203,8 @@ class find_lanes():
         nonzeroy = np.array(nonzero[0])
         nonzerox = np.array(nonzero[1])
         
-        last_fit_left = self.last_fit_left
-        last_fit_right = self.last_fit_right
+        last_fit_left = np.nanmean(self.recent_left_fits, axis=0)
+        last_fit_right = np.nanmean(self.recent_right_fits, axis=0)
         
         left_lane_inds = ((nonzerox > (last_fit_left[0]*(nonzeroy**2) + last_fit_left[1]*nonzeroy + 
         last_fit_left[2] - self.margin)) & (nonzerox < (last_fit_left[0]*(nonzeroy**2) + 
@@ -244,18 +224,20 @@ class find_lanes():
         if len(self.leftx) > self.minpix:
             left_fit  = np.polyfit(self.lefty, self.leftx, 2)
             self.last_fit_left = left_fit
-            if len(self.rightx) > self.minpix:    
-                right_fit  = np.polyfit(self.righty, self.rightx, 2)
-                self.last_fit_right = right_fit 
-                self.detected = True
-            else:
-                print("right fit reqires more points!", len(self.rightx) )
-                self.detected = False
-                right_fit = np.nanmean(self.recent_right_fits, axis=0)
         else:
-            print("left fit reqires more points!", len(self.leftx))
-            self.detected = False
-            left_fit = np.nanmean(self.recent_left_fits, axis=0)
+            print("left fit requires more points!", len(self.leftx))
+            left_fit = np.nanmean(self.recent_left_fits, axis=0)    
+            
+        if len(self.rightx) > self.minpix:    
+            right_fit  = np.polyfit(self.righty, self.rightx, 2)
+            self.last_fit_right = right_fit 
+        else:
+            print("right fit requires more points!", len(self.rightx) )     
+            right_fit = np.nanmean(self.recent_right_fits, axis=0)
+
+
+        
+
             
         # Generate x and y values for plotting
         self.ploty = np.linspace(0, binary_warped.shape[0]-1, binary_warped.shape[0] )
@@ -493,17 +475,21 @@ class find_lanes():
             
             self.recent_left_fits.append(self.last_fit_left)
             self.recent_right_fits.append(self.last_fit_right)
-
-                
             self.detected = True
+            self.fail_counter = 0
         
             
         elif self.last_lane_score < self.quality * np.nanmedian(self.recent_lane_scores, axis=0):
             
-            print ("lanes score less than", self.quality*100,"% of median of recent lane scores!!" , "last score:", self.last_lane_score,"median score: ", np.nanmedian(self.recent_lane_scores) )
+            print ("lanes score less than", self.quality*100,"% of median of recent lane scores!!")
+            self.fail_counter += 1
+            
+        ## checks how often scan rows near fit fails and for fails above fail limit, sliding window will be used    
+        if self.fail_counter >= self.fail_limit: 
             self.detected = False
+            self.fail_counter = 0
     
-        
+        print("failed lane detection", self.fail_counter)
         ## keep only last n_lanes
 #        print("lenght recent left lane fits", len(self.recent_left_fits))
 #        print("lenght recent right lane fits", len(self.recent_right_fits))
@@ -530,14 +516,15 @@ class find_lanes():
       #  self.calc_curvature()
         img_out = self.draw_lanes(mean_recent_left_lane_fits, mean_recent_right_lane_fits)
         
-        plt.figure(0)
+        plt.figure(0, figsize=(20,10))
+        
         plt.imshow(img_out)
         return img_out
 
     
     def draw_lanes(self, left_fit, right_fit):
         
-        undistorted_image = pers.undist(self.img, calib_filename = "C:/Users/Chris/SDC_projects/CarND-Advanced-Lane-Lines-P4/saved_calibration.p")
+        undistorted_image = pers.undist(self.img, calib_filename = "saved_calibration.p")
         y_vals = np.arange(0, self.image_height)
     
         left_fitx = self.get_x_for_line(left_fit, y_vals)
@@ -561,12 +548,12 @@ class find_lanes():
         
         # Obtain distance from center and curvature radius
 
-#        print("test321", self.curverad, self.distance_from_center)
+#      
         # Print curvature and center offset on an image
         stats_text = 'Curvature: {0:.0f}m, Center offset: {1:.1f}m'.format(self.curverad, \
                                                                     self.distance_from_center, \
                                                                     )
-        stats_text_2 = ('Current  lanes score: '+str(round(self.last_lane_score,2))+' recent lanes score: '+ str(round(np.nanmedian(self.recent_lane_scores),2)))
+        stats_text_2 = ('Current lane score: '+str(self.last_lane_score)+' Recent lanes score: '+ str(np.nanmedian(self.recent_lane_scores)))
         
         print(stats_text)
         print(stats_text_2)
@@ -591,15 +578,16 @@ if __name__ == "__main__":
     
     find_lanes = find_lanes()
     
-    white_output = "C:/Users/Chris/SDC_projects/CarND-Advanced-Lane-Lines-P4/output_project_video.mp4"
+    white_output = "out_harder_challenge_video.mp4"
     ## To speed up the testing process you may want to try your pipeline on a shorter subclip of the video
     ## To do so add .subclip(start_second,end_second) to the end of the line below
     ## Where start_second and end_second are integer values representing the start and end of the subclip
     ## You may also uncomment the following line for a subclip of the first 5 seconds
     ##clip1 = VideoFileClip("test_videos/solidWhiteRight.mp4").subclip(0,5)
-    clip1 = VideoFileClip("C:/Users/Chris/SDC_projects/CarND-Advanced-Lane-Lines-P4/project_video.mp4")#.subclip(22,29)
-    img = clip1.get_frame(0)
+    clip1 = VideoFileClip('harder_challenge_video.mp4')#.subclip(22,29)
+    img = clip1.get_frame(15)
     print ("current image shape ", img.shape)
+   # find_lanes.main_test(img)
     white_clip = clip1.fl_image(find_lanes.main_test) #NOTE: this function expects color images!!
     white_clip.write_videofile(white_output, audio=False)
 
@@ -647,7 +635,7 @@ if __name__ == "__main__":
 #        img = mpimg.imread(filename)
 #        print ("current image name ", filename)
 #        
-#        find_lanes.main_test(img)
+#      find_lanes.main_test(img)
  
 #        
 #        

@@ -28,7 +28,7 @@ The goals / steps of this project are the following:
 [image6]: ./output_images/search_near_fit.png "Searching lane points near last fit"
 [image7]: ./output_images/curvature.png "Formular for the curvature"
 [image8]: ./output_images/lane_finding_example.png "Final output of the pipeline"
-[video1]: ./out_project_video_n10_q50.mp4 "Video"
+[video1]: ./out_project_video_n5_q20.mp4 "Project Video"
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
 

@@ -137,9 +137,12 @@ Here's a [link to my video result](./output_project_video_5scores_q50.mp4)
 
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
-Backbone of the pipeline is threshholding and binary image creation (feature extraction) to use them as points for polynomial fits. In case of changes in the illumination the pipeline is likely to fail since the color and gradient threshholds are static and new gradients and colors might appear in the images. More robust techniques for feature extraction are neccassary like adaptive threshholding or deep neural networks.
-Also information regarding the direction of the movement (optical flow) could be used to estimate the movement of the car.
+Backbone of the pipeline is color and gradient threshholding and binary image creation (feature extraction) to use them as points for polynomial fits. In case of changes in the illumination the pipeline is likely to fail since the color and gradient threshholds are static and new gradients and colors might appear in the images. More robust techniques for feature extraction are neccassary like adaptive threshholding or deep neural networks.
 
+The pipeline was also used for challenge videos. In the first challenge video the pipeline fails when strong changes in illumination occurs which can be observed in the shadowed areas (under the bridge) but it also fails during fast changes of lane line positions (yellow line). The latter can be adressed using a bigger margin or search window in a first approach. 
+To avoid lane misdetections related to shadows, the pipeline needs robust features as basic input (see above).
+Also information regarding the direction of the movement (optical flow) could be used to estimate the movement of surrounding environment of the car.
 
+In the second challenge video high gradients in illumination, even saturation effects of the camera sensor but also reflections in the front window lead to an unsufficiant lane line detection result. Since it is even hard for humans to find the lane lines under these conditions, the usage of additional sensors is highly recommended. Also cameras with external illumination could be used to get a more reliable result.  
 
 
